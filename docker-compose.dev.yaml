@@ -1,0 +1,26 @@
+services:
+  postgres-invoiceservice:
+    image: postgres:15.0
+    container_name: postgres-invoiceservice
+    ports:
+      - 5435:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=invoiceservice
+    networks:
+      - nginx-proxy-manager
+      - redpanda_network
+      - keycloak
+
+networks:
+  nginx-proxy-manager:
+    driver: bridge
+    name: nginx-proxy-manager
+  redpanda_network:
+    driver: bridge
+    name: redpanda_network
+  keycloak:
+    driver: bridge
+    name: keycloak
+
