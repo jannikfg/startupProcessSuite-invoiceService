@@ -7,7 +7,7 @@ public interface InvoiceRepository {
 
   void saveInvoice(Invoice invoice);
 
-  Invoice getInvoice(String invoiceId);
+  Invoice getInvoiceById(String invoiceId);
 
   void deleteInvoice(String invoiceId);
 
