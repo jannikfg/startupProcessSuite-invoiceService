@@ -13,36 +13,27 @@ import lombok.Setter;
 public class Invoice {
 
   @Setter(AccessLevel.NONE)
-  private String invoiceId; //Rechnungsnummer
+  private String id; //Rechnungsnummer
+  private String description; //Beschreibung
   private LocalDate createdDate; //Erstellungsdatum
   private List<InvoiceItem> invoiceItems; //Liste der Rechnungspositionen
   private String clientId; //Kundennummer
   private LocalDate dateOfDelivery; //Lieferdatum bzw. Datum der erbrachten Dienstleistung
-  private String invoiceDocumentId; //DokumentenId der Rechnung
   private String noticeOfTaxExemption; //Hinweis bei Steuerbefreiung
   private String noticeOfRetentionObligation; // In den Fällen des $14 b Abs. 1 Satz 5 UStF einen Hinweis auf die Aufbewahrungspflicht des Rechnungsempfängers
+  private double netTotal; //Nettobetrag
+  private double taxTotal; //Steuerbetrag
+  private double total; //Gesamtbetrag
 
-  public Invoice(String invoiceId, List<InvoiceItem> invoiceItems, String clientId, LocalDate dateOfDelivery, String invoiceDocumentId, String noticeOfTaxExemption, String noticeOfRetentionObligation) {
-    this.invoiceId = invoiceId;
+  public Invoice(String id, List<InvoiceItem> invoiceItems, String clientId,
+      LocalDate dateOfDelivery, String noticeOfTaxExemption, String noticeOfRetentionObligation) {
+    this.id = id;
     this.createdDate = LocalDate.now();
     this.invoiceItems = invoiceItems;
     this.clientId = clientId;
     this.dateOfDelivery = dateOfDelivery;
-    this.invoiceDocumentId = invoiceDocumentId;
     this.noticeOfTaxExemption = noticeOfTaxExemption;
     this.noticeOfRetentionObligation = noticeOfRetentionObligation;
-  }
-
-  public double getTotal() {
-    return invoiceItems.stream().mapToDouble(InvoiceItem::getTotal).sum();
-  }
-
-  public double getNetTotal() {
-    return invoiceItems.stream().mapToDouble(InvoiceItem::getNetTotal).sum();
-  }
-
-  public double getTaxTotal() {
-    return invoiceItems.stream().mapToDouble(InvoiceItem::getTaxTotal).sum();
   }
 
 }

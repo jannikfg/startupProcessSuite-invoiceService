@@ -16,7 +16,6 @@ public class JpaInvoiceRepositoryImpl implements InvoiceRepository {
   public void saveInvoice(Invoice invoice) {
     InvoiceEntity invoiceEntity = new InvoiceEntity();
     invoiceEntity.setClientId(invoice.getClientId());
-    invoiceEntity.setInvoiceDocumentId(invoice.getInvoiceDocumentId());
     jpaInvoiceRepository.persist(invoiceEntity);
   }
 

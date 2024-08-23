@@ -11,14 +11,14 @@ import org.thi.sps.domain.model.InvoiceItem;
 
 public interface InvoiceService {
 
-  Invoice createInvoice(String invoiceId, List<InvoiceItem> invoiceItems, String clientId,
+  Invoice createInvoice(List<InvoiceItem> invoiceItems, String clientId,
       LocalDate dateOfDelivery, String invoiceDocumentId, String noticeOfTaxExemption,
       String noticeOfRetentionObligation);
 
-  void addItem(UUID invoiceId, ProductCategory category, String description, double price,
+  void addItem(String invoiceId, ProductCategory category, String description, double price,
       int quantity, Unit unit, TaxRate tax, double discount);
 
-  void removeItem(UUID invoiceId, String description);
+  void removeItem(String invoiceId, String description);
 
   Invoice getInvoiceById(String invoiceId);
 

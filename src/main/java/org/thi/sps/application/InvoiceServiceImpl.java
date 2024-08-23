@@ -3,7 +3,6 @@ package org.thi.sps.application;
 import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.ENUM.ProductCategory;
 import org.thi.sps.domain.model.ENUM.TaxRate;
@@ -20,19 +19,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
   @Override
-  public Invoice createInvoice(String invoiceId, List<InvoiceItem> invoiceItems, String clientId,
+  public Invoice createInvoice(List<InvoiceItem> invoiceItems, String clientId,
       LocalDate dateOfDelivery, String invoiceDocumentId, String noticeOfTaxExemption,
       String noticeOfRetentionObligation) {
-    Invoice newInvoice = new Invoice(generateInvoiceId(), invoiceItems, clientId, dateOfDelivery, invoiceDocumentId,
+    Invoice newInvoice = new Invoice(generateInvoiceId(), invoiceItems, clientId, dateOfDelivery,
         noticeOfTaxExemption, noticeOfRetentionObligation);
     invoiceRepository.saveInvoice(newInvoice);
     return newInvoice;
   }
 
   @Override
-  public void addItem(UUID invoiceId, ProductCategory category, String description, double price,
+  public void addItem(String invoiceId, ProductCategory category, String description, double price,
       int quantity, Unit unit, TaxRate tax, double discount) {
-    Invoice invoice = invoiceRepository.getInvoiceById(invoiceId.toString());
+    Invoice invoice = invoiceRepository.getInvoiceById(invoiceId);
     if (invoice != null) {
       InvoiceItem newItem = new InvoiceItem(category, description, price, quantity, unit, tax,
           discount);
@@ -41,10 +40,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
   }
 
-
   @Override
-  public void removeItem(UUID invoiceId, String description) {
-    invoiceRepository.deleteInvoice(invoiceId.toString());
+  public void removeItem(String invoiceId, String description) {
+    invoiceRepository.deleteInvoice(invoiceId);
   }
 
   @Override
@@ -61,4 +59,26 @@ public class InvoiceServiceImpl implements InvoiceService {
   public String generateInvoiceId() {
     return null;
   }
+
+  /*public double getTaxTotal() {
+    return netPrice * quantity * tax.getRate();
+  }
+
+  public double getNetTotal() {
+    return netPrice * quantity * (1 - discount);
+  }
+
+  public double getTotal() {
+    return invoiceItems.stream().mapToDouble(InvoiceItem::getTotal).sum();
+  }
+
+  public double getNetTotal() {
+    return invoiceItems.stream().mapToDouble(InvoiceItem::getNetTotal).sum();
+  }
+
+  public double getTaxTotal() {
+    return invoiceItems.stream().mapToDouble(InvoiceItem::getTaxTotal).sum();
+  }
+  */
+
 }

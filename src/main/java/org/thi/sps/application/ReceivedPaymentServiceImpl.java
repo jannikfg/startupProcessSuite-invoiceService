@@ -2,7 +2,6 @@ package org.thi.sps.application;
 
 import jakarta.inject.Inject;
 import org.thi.sps.domain.InvoiceService;
-import org.thi.sps.domain.ReceivedPaymentService;
 import org.thi.sps.domain.model.Invoice;
 
 public class ReceivedPaymentServiceImpl implements ReceivedPaymentService {
