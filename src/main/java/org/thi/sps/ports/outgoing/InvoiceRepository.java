@@ -5,12 +5,16 @@ import org.thi.sps.domain.model.Invoice;
 
 public interface InvoiceRepository {
 
-  void saveInvoice(Invoice invoice);
+  Invoice save(Invoice invoice);
 
-  Invoice getInvoiceById(String invoiceId);
+  Invoice update(Invoice invoice);
 
-  void deleteInvoice(String invoiceId);
+  Invoice findById(String id);
 
-  List<Invoice> getInvoicesByClient(String clientId);
+  void delete(String invoiceId);
+
+  List<Invoice> findByClientId(String clientId);
+
+  List<Invoice> findAll();
 
 }

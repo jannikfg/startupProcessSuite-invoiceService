@@ -1,44 +1,49 @@
 package org.thi.sps.adapter.api.rest.dto;
 
 import java.time.LocalDate;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.thi.sps.domain.model.InvoiceRequest;
 import org.thi.sps.domain.model.InvoiceRequestItem;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Builder
-public class InvoiceCreationRequest {
+public class InvoiceCreationItemRequest {
 
   private Long id;
+  private String name;
   private String description;
-  private List<InvoiceCreationItemRequest> items;
-  private Long clientId;
-  private LocalDate offerDate;
-  private LocalDate validUntil;
+  private String category;
+  private double quantity;
+  private String unit;
   private LocalDate dateOfDelivery;
 
+  private double netPrice;
+  private double discount;
   private double netTotal;
+
+  private double taxRate;
   private double taxTotal;
+
   private double total;
 
-  public InvoiceRequest toInvoiceRequest() {
-    return InvoiceRequest.builder()
+  public InvoiceRequestItem toInvoiceRequestItem() {
+    return InvoiceRequestItem.builder()
+        .id(this.id)
+        .name(this.name)
         .description(this.description)
-        .items(this.items.stream().map(InvoiceCreationItemRequest::toInvoiceRequestItem).toList())
-        .clientId(this.clientId)
-        .offerDate(this.offerDate)
-        .validUntil(this.validUntil)
+        .category(this.category)
+        .quantity(this.quantity)
+        .unit(this.unit)
+        .netPrice(this.netPrice)
+        .discount(this.discount)
         .netTotal(this.netTotal)
+        .taxRate(this.taxRate)
         .taxTotal(this.taxTotal)
         .total(this.total)
         .build();

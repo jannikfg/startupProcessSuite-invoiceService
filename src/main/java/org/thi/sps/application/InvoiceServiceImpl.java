@@ -1,64 +1,71 @@
 package org.thi.sps.application;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import org.thi.sps.domain.InvoiceService;
-import org.thi.sps.domain.model.ENUM.ProductCategory;
-import org.thi.sps.domain.model.ENUM.TaxRate;
-import org.thi.sps.domain.model.ENUM.Unit;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
+import org.thi.sps.domain.model.InvoiceRequest;
+import org.thi.sps.domain.model.InvoiceRequestItem;
 import org.thi.sps.ports.outgoing.InvoiceRepository;
 
-
+@ApplicationScoped
 public class InvoiceServiceImpl implements InvoiceService {
 
   @Inject
   InvoiceRepository invoiceRepository;
 
+  private final String noticeOfTaxExemption = "Notice of tax exemption";
+  private final String noticeOfRetentionObligation = "Notice of retention obligation";
+
 
   @Override
-  public Invoice createInvoice(List<InvoiceItem> invoiceItems, String clientId,
-      LocalDate dateOfDelivery, String invoiceDocumentId, String noticeOfTaxExemption,
-      String noticeOfRetentionObligation) {
-    Invoice newInvoice = new Invoice(generateInvoiceId(), invoiceItems, clientId, dateOfDelivery,
-        noticeOfTaxExemption, noticeOfRetentionObligation);
-    invoiceRepository.saveInvoice(newInvoice);
-    return newInvoice;
-  }
+  @Transactional
+  public Invoice createInvoice(InvoiceRequest invoiceRequest) {
 
-  @Override
-  public void addItem(String invoiceId, ProductCategory category, String description, double price,
-      int quantity, Unit unit, TaxRate tax, double discount) {
-    Invoice invoice = invoiceRepository.getInvoiceById(invoiceId);
-    if (invoice != null) {
-      InvoiceItem newItem = new InvoiceItem(category, description, price, quantity, unit, tax,
-          discount);
-      invoice.getInvoiceItems().add(newItem);
-      invoiceRepository.saveInvoice(invoice);
-    }
-  }
+    List<InvoiceItem> invoiceItems = invoiceRequest.getItems().stream()
+        .map(InvoiceRequestItem::toInvoiceItem).toList();
 
-  @Override
-  public void removeItem(String invoiceId, String description) {
-    invoiceRepository.deleteInvoice(invoiceId);
+    Invoice invoice = Invoice.builder()
+        .id(String.valueOf(Math.random()*100))
+        .clientId(invoiceRequest.getClientId())
+        .description(invoiceRequest.getDescription())
+        .createdDate(LocalDate.now())
+        .invoiceItems(invoiceItems)
+        .dateOfDelivery(invoiceRequest.getDateOfDelivery())
+        .noticeOfTaxExemption(noticeOfTaxExemption)
+        .noticeOfRetentionObligation(noticeOfRetentionObligation)
+        .build();
+    return invoiceRepository.save(invoice);
   }
 
   @Override
   public Invoice getInvoiceById(String invoiceId) {
-    return invoiceRepository.getInvoiceById(invoiceId);
+    return null;
   }
 
   @Override
   public List<Invoice> getInvoicesByClientId(String clientId) {
-    return invoiceRepository.getInvoicesByClient(clientId);
+    return null;
   }
 
   @Override
   public String generateInvoiceId() {
     return null;
   }
+
+  @Override
+  public List<Invoice> getAllInvoices() {
+    List<Invoice> invoices = invoiceRepository.findAll();
+    System.out.println("Invoices in InvoiceServiceImpl: " + invoices);
+    return invoices;
+  }
+
+
+
 
   /*public double getTaxTotal() {
     return netPrice * quantity * tax.getRate();
