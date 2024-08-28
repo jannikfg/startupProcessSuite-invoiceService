@@ -1,5 +1,6 @@
 package org.thi.sps.ports.outgoing;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.thi.sps.domain.model.Invoice;
 

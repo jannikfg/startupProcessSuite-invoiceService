@@ -1,4 +1,4 @@
-package org.thi.sps.domain.model;
+package org.thi.sps.domain.model.helper;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.thi.sps.domain.model.InvoiceItem;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,7 +20,7 @@ public class InvoiceRequest {
 
   private Long id;
   private String description;
-  private List<InvoiceRequestItem> items;
+  private List<InvoiceItem> items;
   private Long clientId;
   private LocalDate offerDate;
   private LocalDate validUntil;

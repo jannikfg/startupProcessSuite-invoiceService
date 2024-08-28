@@ -32,7 +32,6 @@ public class InvoiceEntity {
   private Long clientId;
 
   @OneToMany(cascade = CascadeType.ALL)
-
   private List<InvoiceItemEntity> items;
 
   private LocalDate dateOfDelivery;

@@ -8,8 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.thi.sps.domain.model.InvoiceRequest;
-import org.thi.sps.domain.model.InvoiceRequestItem;
+import org.thi.sps.domain.model.helper.InvoiceRequest;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,9 +18,9 @@ import org.thi.sps.domain.model.InvoiceRequestItem;
 @Builder
 public class InvoiceCreationRequest {
 
-  private Long id;
+  private String id;
   private String description;
-  private List<InvoiceCreationItemRequest> items;
+  private List<InvoiceItemRequest> items;
   private Long clientId;
   private LocalDate offerDate;
   private LocalDate validUntil;
@@ -34,7 +33,7 @@ public class InvoiceCreationRequest {
   public InvoiceRequest toInvoiceRequest() {
     return InvoiceRequest.builder()
         .description(this.description)
-        .items(this.items.stream().map(InvoiceCreationItemRequest::toInvoiceRequestItem).toList())
+        .items(this.items.stream().map(InvoiceItemRequest::toInvoiceItem).toList())
         .clientId(this.clientId)
         .offerDate(this.offerDate)
         .validUntil(this.validUntil)

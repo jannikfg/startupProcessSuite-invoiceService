@@ -10,11 +10,16 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import lombok.NoArgsConstructor;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
+import org.thi.sps.adapter.api.rest.dto.InvoiceChangeWithNewProductsRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
+import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceResponse;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
-import org.thi.sps.domain.model.InvoiceRequest;
+import org.thi.sps.domain.model.Product;
+import org.thi.sps.domain.model.helper.InvoiceRequest;
 
 @ApplicationScoped
 @NoArgsConstructor
@@ -45,6 +50,42 @@ public class InvoiceController {
   public List<InvoiceResponse> getAllInvoices() {
     List<Invoice> invoices = invoiceService.getAllInvoices();
     return invoices.stream().map(InvoiceResponse::fromInvoice).toList();
+  }
+
+  @POST
+  @Path("/updateWithNewProducts")
+  public InvoiceResponse updateInvoice(
+      @RequestBody InvoiceChangeWithNewProductsRequest invoiceChangeWithNewProductsRequest) {
+    List<Product> newProducts = invoiceService.getProducts(
+        invoiceChangeWithNewProductsRequest.getItemsToAdd(),
+        invoiceChangeWithNewProductsRequest.getProductsFromService());
+    System.out.println("New Products: " + newProducts);
+    Invoice invoice = buildInvoiceFromInvoiceChangeRequest(
+        invoiceChangeWithNewProductsRequest.getInvoiceChangeRequest());
+    System.out.println("Invoice in updateInvoice with new: " + invoice);
+    Invoice invoiceUpdated = invoiceService.updateInvoiceWithNewProducts(invoice, newProducts);
+    System.out.println("Invoice updated: " + invoiceUpdated);
+    return InvoiceResponse.fromInvoice(invoiceUpdated);
+  }
+
+  @POST
+  @Path("/update")
+  public InvoiceResponse updateInvoice(InvoiceChangeRequest invoiceChangeRequest) {
+    Invoice invoice = buildInvoiceFromInvoiceChangeRequest(invoiceChangeRequest);
+    Invoice invoiceUpdated = invoiceService.updateInvoice(invoice);
+    return InvoiceResponse.fromInvoice(invoiceUpdated);
+  }
+
+  private Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
+    return Invoice.builder()
+        .id(invoiceChangeRequest.getId())
+        .description(invoiceChangeRequest.getDescription())
+        .invoiceItems(
+            invoiceChangeRequest.getInvoiceItems().stream().map(InvoiceItemRequest::toInvoiceItem)
+                .toList())
+        .noticeOfRetentionObligation(invoiceChangeRequest.getNoticeOfRetentionObligation())
+        .noticeOfTaxExemption(invoiceChangeRequest.getNoticeOfTaxExemption())
+        .build();
   }
 
 

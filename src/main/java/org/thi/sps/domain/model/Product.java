@@ -20,7 +20,7 @@ public class Product {
   private String description;
   private double netPrice;
   private String unit;
-  private String tax;
+  private String taxRate;
   private double discount;
   private double quantity;
 }
