@@ -35,6 +35,7 @@ public class JpaInvoiceRepositoryImpl implements InvoiceRepository {
   @Override
   public Invoice findById(String id) {
     Optional<InvoiceEntity> invoiceEntity = jpaInvoiceRepository.findByIdOptional(id);
+    System.out.println("InvoiceEntity: " + invoiceEntity.toString());
     return invoiceEntity.map(InvoiceEntity::toInvoice).orElse(null);
   }
 

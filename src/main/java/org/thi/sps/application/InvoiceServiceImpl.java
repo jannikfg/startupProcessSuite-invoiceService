@@ -97,6 +97,7 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Transactional
   public Invoice updateInvoice(Invoice invoice) {
     Invoice invoiceFromDb = invoiceRepository.findById(invoice.getId());
+    System.out.println("InvoiceFromDb: " + invoiceFromDb);
     if (invoiceFromDb == null) {
       throw new InvoiceNotFoundException("Invoice not found with id: " + invoice.getId());
     }
@@ -144,6 +145,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Override
   public Invoice getInvoiceById(String invoiceId) {
+    System.out.println("InvoiceId: " + invoiceId);
     return invoiceRepository.findById(invoiceId);
   }
 
@@ -194,11 +196,6 @@ public class InvoiceServiceImpl implements InvoiceService {
       }
     }
     return newProducts;
-  }
-
-  @Override
-  public Invoice getInvoice(String id) {
-    return invoiceRepository.findById(id);
   }
 
 

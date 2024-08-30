@@ -53,7 +53,8 @@ public class InvoiceController {
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public InvoiceResponse getInvoice(@PathParam("id")String id) {
-    Invoice invoice = invoiceService.getInvoice(id);
+    System.out.println("Get invoice with id: " + id);
+    Invoice invoice = invoiceService.getInvoiceById(id);
     return InvoiceResponse.fromInvoice(invoice);
   }
 
