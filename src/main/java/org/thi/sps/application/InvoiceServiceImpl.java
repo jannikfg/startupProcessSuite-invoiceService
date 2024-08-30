@@ -196,5 +196,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     return newProducts;
   }
 
+  @Override
+  public Invoice getInvoice(String id) {
+    return invoiceRepository.findById(id);
+  }
+
 
 }

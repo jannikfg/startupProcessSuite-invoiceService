@@ -6,6 +6,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
@@ -46,6 +47,14 @@ public class InvoiceController {
   public List<InvoiceResponse> getAllInvoices() {
     List<Invoice> invoices = invoiceService.getAllInvoices();
     return invoices.stream().map(InvoiceResponse::fromInvoice).toList();
+  }
+
+  @GET
+  @Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public InvoiceResponse getInvoice(@PathParam("id")String id) {
+    Invoice invoice = invoiceService.getInvoice(id);
+    return InvoiceResponse.fromInvoice(invoice);
   }
 
   @POST

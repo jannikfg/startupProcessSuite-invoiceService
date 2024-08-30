@@ -29,4 +29,6 @@ public interface InvoiceService {
 
   List<Product> getProducts(List<InvoiceItemsAdditionRequest> itemsToAdd,
       List<Product> productsFromService);
+
+  Invoice getInvoice(String id);
 }
