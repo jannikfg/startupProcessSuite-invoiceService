@@ -37,6 +37,7 @@ public class InvoiceCreationRequest {
         .clientId(this.clientId)
         .offerDate(this.offerDate)
         .validUntil(this.validUntil)
+        .dateOfDelivery(this.dateOfDelivery)
         .netTotal(this.netTotal)
         .taxTotal(this.taxTotal)
         .total(this.total)

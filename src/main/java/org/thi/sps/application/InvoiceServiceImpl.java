@@ -54,53 +54,38 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   private void calculateInvoiceItems(List<InvoiceItem> invoiceItems) {
     for (InvoiceItem invoiceItem : invoiceItems) {
-      System.out.println("InvoiceItem in InvoiceServiceImpl in create Invoice before Calculation: " + invoiceItem);
       invoiceItem.setNetTotal(calculateNetTotalForInvoiceItem(invoiceItem));
       invoiceItem.setTaxTotal(calculateTaxTotalForInvoiceItem(invoiceItem));
       invoiceItem.setTotal(calculateTotalForInvoiceItem(invoiceItem));
-      System.out.println("InvoiceItem in InvoiceServiceImpl in create Invoice after Calculation: " + invoiceItem);
     }
   }
 
   private double calculateTotalForInvoice(List<InvoiceItem> invoiceItems) {
-    double value = invoiceItems.stream().mapToDouble(InvoiceItem::getTotal).sum();
-    System.out.println("Total in calculateTotalForInvoice in InvoiceServiceImpl: " + value);
-    return value;
+    return invoiceItems.stream().mapToDouble(InvoiceItem::getTotal).sum();
   }
 
   private double calculateNetTotalForInvoice(List<InvoiceItem> invoiceItems) {
-    double value = invoiceItems.stream().mapToDouble(InvoiceItem::getNetTotal).sum();
-    System.out.println("NetTotal in calculateNetTotalForInvoice in InvoiceServiceImpl: " + value);
-    return value;
+    return invoiceItems.stream().mapToDouble(InvoiceItem::getNetTotal).sum();
   }
 
   private double calculateTaxTotalForInvoice(List<InvoiceItem> invoiceItems) {
-    double value = invoiceItems.stream().mapToDouble(InvoiceItem::getTaxTotal).sum();
-    System.out.println("TaxTotal in calculateTaxTotalForInvoice in InvoiceServiceImpl: " + value);
-    return value;
+    return invoiceItems.stream().mapToDouble(InvoiceItem::getTaxTotal).sum();
   }
 
   private double calculateNetTotalForInvoiceItem(InvoiceItem invoiceItem) {
-    double value = invoiceItem.getNetPrice() * invoiceItem.getQuantity() * (1 - invoiceItem.getDiscount());
-    System.out.println("NetTotal in calculateNetTotalForInvoiceItem in InvoiceServiceImpl: " + value);
-    return value;
+    return invoiceItem.getNetPrice() * invoiceItem.getQuantity() * (1 - invoiceItem.getDiscount());
   }
 
   private double calculateTaxTotalForInvoiceItem(InvoiceItem invoiceItem) {
-    double value = invoiceItem.getNetTotal() * invoiceItem.getTaxRate();
-    System.out.println("TaxTotal in calculateTaxTotalForInvoiceItem in InvoiceServiceImpl: " + value);
-    return value;
+    return invoiceItem.getNetTotal() * invoiceItem.getTaxRate();
   }
 
   private double calculateTotalForInvoiceItem(InvoiceItem invoiceItem) {
-    double value = invoiceItem.getNetTotal() + invoiceItem.getTaxTotal();
-    System.out.println("Total in calculateTotalForInvoiceItem in InvoiceServiceImpl: " + value);
-    return value;
+    return invoiceItem.getNetTotal() + invoiceItem.getTaxTotal();
   }
   @Override
   public Invoice updateInvoiceWithNewProducts(Invoice invoice, List<Product> items) {
     List<InvoiceItem> invoiceItems = new ArrayList<>(invoice.getInvoiceItems());
-    System.out.println("InvoiceItems in updateInvoiceWithNewProducts in InvoiceServiceImpl: " + invoiceItems);
     if (items != null) {
       invoiceItems.addAll(transfromNewProductsToInvoiceItems(items));
     }
@@ -129,26 +114,32 @@ public class InvoiceServiceImpl implements InvoiceService {
   }
 
   private List<InvoiceItem> transfromNewProductsToInvoiceItems(List<Product> products){
-    System.out.println("Products in transfromNewProductsToInvoiceItems in InvoiceServiceImpl: " + products);
     List<InvoiceItem> invoiceItems = new ArrayList<>();
     for (Product item : products) {
       invoiceItems.add(InvoiceItem.builder()
-          .id(item.getId())
           .name(item.getName())
           .description(item.getDescription())
           .category(item.getCategory())
           .quantity(item.getQuantity())
           .unit(item.getUnit())
+          .discount(item.getDiscount())
           .netPrice(item.getNetPrice() - item.getNetPrice() * item.getDiscount())
-          .taxRate(item.getTaxRate() != null ? Double.parseDouble(item.getTaxRate()) : 0.0)
+          .taxRate(parseTaxRate(item.getTaxRate()))
           .netTotal(item.getNetPrice() * item.getQuantity())
           .taxTotal(item.getNetPrice() * item.getQuantity() * Double.parseDouble(item.getTaxRate()))
           .total(item.getNetPrice() * item.getQuantity() * Double.parseDouble(item.getTaxRate())
               + item.getNetPrice() * item.getQuantity())
           .build());
     }
-    System.out.println("InvoiceItems in transfromNewProductsToInvoiceItems in InvoiceServiceImpl: " + invoiceItems);
     return invoiceItems;
+  }
+
+  private double parseTaxRate(String taxRateStr) {
+    try {
+      return taxRateStr != null ? Double.parseDouble(taxRateStr) : 0.0;
+    } catch (NumberFormatException e) {
+      return 0.19;  // Standardwert, wenn das Parsen fehlschlägt
+    }
   }
 
   @Override
@@ -183,7 +174,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Override
   public List<Invoice> getAllInvoices() {
     List<Invoice> invoices = invoiceRepository.findAll();
-    System.out.println("Invoices in InvoiceServiceImpl: " + invoices);
     return invoices;
   }
 
@@ -197,11 +187,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     for (InvoiceItemsAdditionRequest item : itemsToAdd) {
       for (Product product : productsFromService) {
         if (product.getId().equals(item.getId())) {
+          product.setQuantity(item.getQuantity());
+          product.setDiscount(item.getDiscount());
           newProducts.add(product);
         }
       }
     }
-    System.out.println("New Products in getProducts in InvoiceServiceImpl: " + newProducts);
     return newProducts;
   }
 

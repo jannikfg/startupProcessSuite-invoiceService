@@ -35,13 +35,9 @@ public class InvoiceController {
   @POST
   @Path("/create")
   public InvoiceResponse createInvoice(InvoiceCreationRequest invoiceCreationRequest) {
-    System.out.println(invoiceCreationRequest);
-
     InvoiceRequest invoiceRequest = invoiceCreationRequest.toInvoiceRequest();
-    System.out.println(invoiceRequest);
-
     Invoice invoice = invoiceService.createInvoice(invoiceRequest);
-    System.out.println(invoice);
+
     return InvoiceResponse.fromInvoice(invoice);
   }
 
@@ -59,12 +55,9 @@ public class InvoiceController {
     List<Product> newProducts = invoiceService.getProducts(
         invoiceChangeWithNewProductsRequest.getItemsToAdd(),
         invoiceChangeWithNewProductsRequest.getProductsFromService());
-    System.out.println("New Products: " + newProducts);
     Invoice invoice = buildInvoiceFromInvoiceChangeRequest(
         invoiceChangeWithNewProductsRequest.getInvoiceChangeRequest());
-    System.out.println("Invoice in updateInvoice with new: " + invoice);
     Invoice invoiceUpdated = invoiceService.updateInvoiceWithNewProducts(invoice, newProducts);
-    System.out.println("Invoice updated: " + invoiceUpdated);
     return InvoiceResponse.fromInvoice(invoiceUpdated);
   }
 
