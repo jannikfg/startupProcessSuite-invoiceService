@@ -16,7 +16,9 @@ import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeWithNewProductsRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
+import org.thi.sps.adapter.api.rest.dto.InvoicePaidStatusChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceResponse;
+import org.thi.sps.adapter.api.rest.dto.PaymentAdditionRequest;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.Product;
@@ -31,7 +33,6 @@ public class InvoiceController {
 
   @Inject
   InvoiceService invoiceService;
-
 
   @POST
   @Path("/create")
@@ -52,7 +53,7 @@ public class InvoiceController {
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public InvoiceResponse getInvoice(@PathParam("id")String id) {
+  public InvoiceResponse getInvoice(@PathParam("id") String id) {
     System.out.println("Get invoice with id: " + id);
     Invoice invoice = invoiceService.getInvoiceById(id);
     return InvoiceResponse.fromInvoice(invoice);
@@ -77,6 +78,25 @@ public class InvoiceController {
     Invoice invoice = buildInvoiceFromInvoiceChangeRequest(invoiceChangeRequest);
     Invoice invoiceUpdated = invoiceService.updateInvoice(invoice);
     return InvoiceResponse.fromInvoice(invoiceUpdated);
+  }
+
+  @GET
+  @Path("/{id}/setPaid")
+  public InvoiceResponse setPaid(@PathParam("id") String id) {
+    Invoice invoice = invoiceService.getInvoiceById(id);
+    invoice.setPaid(true);
+    Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
+    return InvoiceResponse.fromInvoice(updatedInvoice);
+  }
+
+  @POST
+  @Path("/addPayment")
+  public InvoiceResponse addPayment(@RequestBody PaymentAdditionRequest paymentAdditionRequest) {
+    Invoice invoice = invoiceService.addPaymentToInvoice(paymentAdditionRequest.getInvoiceId(),
+        paymentAdditionRequest.getPaymentDate(), paymentAdditionRequest.getAmount(),
+        paymentAdditionRequest.getMethod(), paymentAdditionRequest.getReference());
+    Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
+    return InvoiceResponse.fromInvoice(updatedInvoice);
   }
 
   private Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {

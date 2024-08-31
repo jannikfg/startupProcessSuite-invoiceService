@@ -26,7 +26,9 @@ public class Invoice {
   private double netTotal; //Nettobetrag
   private double taxTotal; //Steuerbetrag
   private double total; //Gesamtbetrag
-
-
+  private double totalOutstanding; //Offener Betrag
+  private boolean isPaid; //Bezahlt
+  private List<CreditNote> creditNotes; //Liste der angewendeten Gutschriften
+  private List<Payment> payments; //Liste der Zahlungen
 
 }

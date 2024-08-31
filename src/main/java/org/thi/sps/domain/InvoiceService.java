@@ -1,8 +1,10 @@
 package org.thi.sps.domain;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
+import org.thi.sps.domain.model.CreditNote;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.Product;
 import org.thi.sps.domain.model.helper.InvoiceRequest;
@@ -30,4 +32,7 @@ public interface InvoiceService {
   List<Product> getProducts(List<InvoiceItemsAdditionRequest> itemsToAdd,
       List<Product> productsFromService);
 
+  Invoice addCreditNoteToInvoice(String invoiceId, String reason, double amount);
+
+  Invoice addPaymentToInvoice(String invoiceId, LocalDate paymentDay, double amount, String method, String reference);
 }

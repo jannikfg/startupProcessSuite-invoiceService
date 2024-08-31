@@ -8,13 +8,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.thi.sps.domain.model.CreditNote;
 import org.thi.sps.domain.model.Invoice;
+import org.thi.sps.domain.model.InvoiceItem;
+import org.thi.sps.domain.model.Payment;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,29 +45,76 @@ public class InvoiceEntity {
   private double netTotal;
   private double taxTotal;
   private double total;
+  private double totalOutstanding;
+  private boolean isPaid;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  private List<CreditNoteEntity> creditNotes;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  private List<PaymentEntity> payments;
 
   public Invoice toInvoice() {
+    List<InvoiceItem> items = Optional.ofNullable(this.items)
+        .map(list -> list.stream().map(InvoiceItemEntity::toInvoiceItem).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    List<CreditNote> creditNotes = Optional.ofNullable(this.creditNotes)
+        .map(list -> list.stream().map(CreditNoteEntity::toCreditNote).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    List<Payment> payments = Optional.ofNullable(this.payments)
+        .map(list -> list.stream().map(PaymentEntity::toPayment).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
     return Invoice.builder()
         .id(this.id)
         .description(this.description)
         .createdDate(this.createdDate)
         .clientId(this.clientId)
-        .invoiceItems(this.items.stream().map(InvoiceItemEntity::toInvoiceItem).collect(toList()))
+        .invoiceItems(items)
         .dateOfDelivery(this.dateOfDelivery)
         .noticeOfTaxExemption(this.noticeOfTaxExemption)
         .noticeOfRetentionObligation(this.noticeOfRetentionObligation)
         .netTotal(this.netTotal)
         .taxTotal(this.taxTotal)
         .total(this.total)
+        .totalOutstanding(this.totalOutstanding)
+        .isPaid(this.isPaid)
+        .creditNotes(creditNotes)
+        .payments(payments)
         .build();
   }
 
   public static InvoiceEntity fromInvoice(Invoice invoice) {
-    return new InvoiceEntity(invoice.getId(), invoice.getDescription(), invoice.getCreatedDate(),
+    List<InvoiceItemEntity> items = Optional.ofNullable(invoice.getInvoiceItems())
+        .map(list -> list.stream().map(InvoiceItemEntity::fromInvoiceItem).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    List<CreditNoteEntity> creditNotes = Optional.ofNullable(invoice.getCreditNotes())
+        .map(list -> list.stream().map(CreditNoteEntity::fromCreditNote).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    List<PaymentEntity> payments = Optional.ofNullable(invoice.getPayments())
+        .map(list -> list.stream().map(PaymentEntity::fromPayment).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    return new InvoiceEntity(
+        invoice.getId(),
+        invoice.getDescription(),
+        invoice.getCreatedDate(),
         invoice.getClientId(),
-        invoice.getInvoiceItems().stream().map(InvoiceItemEntity::fromInvoiceItem)
-            .collect(toList()), invoice.getDateOfDelivery(), invoice.getNoticeOfTaxExemption(),
-        invoice.getNoticeOfRetentionObligation(), invoice.getNetTotal(), invoice.getTaxTotal(),
-        invoice.getTotal());
+        items,
+        invoice.getDateOfDelivery(),
+        invoice.getNoticeOfTaxExemption(),
+        invoice.getNoticeOfRetentionObligation(),
+        invoice.getNetTotal(),
+        invoice.getTaxTotal(),
+        invoice.getTotal(),
+        invoice.getTotalOutstanding(),
+        invoice.isPaid(),
+        creditNotes,
+        payments
+    );
   }
 }
