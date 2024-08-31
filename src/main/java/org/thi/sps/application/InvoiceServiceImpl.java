@@ -7,10 +7,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
+import org.thi.sps.adapter.api.rest.dto.NewDocumentCreationRequest;
 import org.thi.sps.application.exeptions.InvoiceNotFoundException;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.CreditNote;
+import org.thi.sps.domain.model.Document;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
 import org.thi.sps.domain.model.Payment;
@@ -109,6 +112,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
     return totalOutstanding;
   }
+
   @Override
   public Invoice updateInvoiceWithNewProducts(Invoice invoice, List<Product> items) {
     List<InvoiceItem> invoiceItems = new ArrayList<>(invoice.getInvoiceItems());
@@ -117,6 +121,38 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
     invoice.setInvoiceItems(invoiceItems);
     return updateInvoice(invoice);
+  }
+
+  @Override
+  public String getLatestDocumentOfInvoice(String invoiceId) {
+    return Optional.ofNullable(getInvoiceById(invoiceId))
+        .map(invoice -> {
+          List<Document> documents = invoice.getDocuments();
+          if (documents != null && !documents.isEmpty()) {
+            return documents.get(documents.size() - 1).getId();
+          } else {
+            return invoice.getId();
+          }
+        })
+        .orElseThrow(() -> new InvoiceNotFoundException("Invoice not found with id: " + invoiceId));
+  }
+
+  @Override
+  public String addNewDocumentToInvoice(NewDocumentCreationRequest newDocumentCreationRequest) {
+    Invoice invoice = getInvoiceById(newDocumentCreationRequest.getInvoiceId());
+    List<Document> documents = new ArrayList<>(invoice.getDocuments());
+    String documentId = getNextDocumentId(invoice);
+    documents.add(Document.builder()
+        .id(documentId)
+        .reason(newDocumentCreationRequest.getReason())
+        .build());
+    invoice.setDocuments(documents);
+    updateInvoice(invoice);
+    return documentId;
+  }
+
+  public String getNextDocumentId(Invoice invoice) {
+    return invoice.getId() + "_" + (invoice.getDocuments().size() + 1);
   }
 
   @Override
@@ -147,10 +183,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     if (invoice.getPayments() != null) {
       invoiceFromDb.setPayments(invoice.getPayments());
     }
+    if (invoice.getDocuments() != null) {
+      invoiceFromDb.setDocuments(invoice.getDocuments());
+    }
     return invoiceRepository.update(invoiceFromDb);
   }
 
-  private List<InvoiceItem> transfromNewProductsToInvoiceItems(List<Product> products){
+  private List<InvoiceItem> transfromNewProductsToInvoiceItems(List<Product> products) {
     List<InvoiceItem> invoiceItems = new ArrayList<>();
     for (Product item : products) {
       invoiceItems.add(InvoiceItem.builder()

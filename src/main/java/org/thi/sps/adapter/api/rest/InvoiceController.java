@@ -18,6 +18,7 @@ import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoicePaidStatusChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceResponse;
+import org.thi.sps.adapter.api.rest.dto.NewDocumentCreationRequest;
 import org.thi.sps.adapter.api.rest.dto.PaymentAdditionRequest;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
@@ -57,6 +58,18 @@ public class InvoiceController {
     System.out.println("Get invoice with id: " + id);
     Invoice invoice = invoiceService.getInvoiceById(id);
     return InvoiceResponse.fromInvoice(invoice);
+  }
+
+  @GET
+  @Path("/{id}/LatestDocument")
+  public String getLatestDocument(@PathParam("id") String id) {
+    return invoiceService.getLatestDocumentOfInvoice(id);
+  }
+
+  @POST
+  @Path("/requestNewDocumentId")
+  public String requestNewDocumentId(@RequestBody NewDocumentCreationRequest newDocumentCreationRequest) {
+    return invoiceService.addNewDocumentToInvoice(newDocumentCreationRequest);
   }
 
   @POST
@@ -108,6 +121,7 @@ public class InvoiceController {
                 .toList())
         .noticeOfRetentionObligation(invoiceChangeRequest.getNoticeOfRetentionObligation())
         .noticeOfTaxExemption(invoiceChangeRequest.getNoticeOfTaxExemption())
+        .documents(invoiceChangeRequest.getDocuments())
         .build();
   }
 

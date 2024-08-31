@@ -3,8 +3,12 @@ package org.thi.sps.adapter.jpa.Entities;
 import static java.util.stream.Collectors.toList;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
@@ -17,6 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.thi.sps.domain.model.CreditNote;
+import org.thi.sps.domain.model.Document;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
 import org.thi.sps.domain.model.Payment;
@@ -54,6 +59,10 @@ public class InvoiceEntity {
   @OneToMany(cascade = CascadeType.ALL)
   private List<PaymentEntity> payments;
 
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(name = "invoice_documents", joinColumns = @JoinColumn(name = "invoice_id"))
+  private List<Document> documents;
+
   public Invoice toInvoice() {
     List<InvoiceItem> items = Optional.ofNullable(this.items)
         .map(list -> list.stream().map(InvoiceItemEntity::toInvoiceItem).collect(toList()))
@@ -83,6 +92,7 @@ public class InvoiceEntity {
         .isPaid(this.isPaid)
         .creditNotes(creditNotes)
         .payments(payments)
+        .documents(this.documents)
         .build();
   }
 
@@ -114,7 +124,8 @@ public class InvoiceEntity {
         invoice.getTotalOutstanding(),
         invoice.isPaid(),
         creditNotes,
-        payments
+        payments,
+        invoice.getDocuments()
     );
   }
 }

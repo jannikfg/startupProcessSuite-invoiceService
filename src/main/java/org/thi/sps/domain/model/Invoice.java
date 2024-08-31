@@ -30,5 +30,6 @@ public class Invoice {
   private boolean isPaid; //Bezahlt
   private List<CreditNote> creditNotes; //Liste der angewendeten Gutschriften
   private List<Payment> payments; //Liste der Zahlungen
+  private List<Document> documents; //Liste der Dokumente
 
 }

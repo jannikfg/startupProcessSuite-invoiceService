@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.thi.sps.domain.model.Document;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,4 +21,5 @@ public class InvoiceChangeRequest {
   private List<InvoiceItemRequest> invoiceItems;
   private String noticeOfTaxExemption;
   private String noticeOfRetentionObligation;
+  private List<Document> documents;
 }

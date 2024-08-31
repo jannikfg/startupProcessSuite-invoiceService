@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.thi.sps.domain.model.Document;
 import org.thi.sps.domain.model.Invoice;
 
 @AllArgsConstructor
@@ -32,6 +33,7 @@ public class InvoiceResponse {
   private boolean isPaid; //Bezahlt
   private List<CreditNoteResponse> creditNotes; //Liste der Gutschriften
   private List<PaymentResponse> payments; //Liste der Zahlungen
+  private List<Document> documents; //Liste der Dokumente
 
 
   public static InvoiceResponse fromInvoice(Invoice invoice) {
@@ -60,6 +62,7 @@ public class InvoiceResponse {
         .isPaid(invoice.isPaid())
         .creditNotes(creditNotes)
         .payments(payments)
+        .documents(invoice.getDocuments())
         .build();
   }
 }
