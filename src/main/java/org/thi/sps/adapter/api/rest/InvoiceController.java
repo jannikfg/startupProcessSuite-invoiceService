@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.thi.sps.adapter.api.rest.dto.DocumentResponse;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeWithNewProductsRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
@@ -62,14 +63,20 @@ public class InvoiceController {
 
   @GET
   @Path("/{id}/LatestDocument")
-  public String getLatestDocument(@PathParam("id") String id) {
-    return invoiceService.getLatestDocumentOfInvoice(id);
+  @Produces(MediaType.APPLICATION_JSON)
+  public DocumentResponse getLatestDocument(@PathParam("id") String id) {
+    String documentId = invoiceService.getLatestDocumentOfInvoice(id);
+    return DocumentResponse.builder().id(documentId).build();
   }
 
   @POST
   @Path("/requestNewDocumentId")
-  public String requestNewDocumentId(@RequestBody NewDocumentCreationRequest newDocumentCreationRequest) {
-    return invoiceService.addNewDocumentToInvoice(newDocumentCreationRequest);
+  public DocumentResponse requestNewDocumentId(@RequestBody NewDocumentCreationRequest newDocumentCreationRequest) {
+    String documentId = invoiceService.addNewDocumentToInvoice(newDocumentCreationRequest);
+    return DocumentResponse.builder()
+        .id(documentId)
+        .reason(newDocumentCreationRequest.getReason())
+        .build();
   }
 
   @POST
