@@ -112,9 +112,11 @@ public class InvoiceController {
   @POST
   @Path("/addPayment")
   public InvoiceResponse addPayment(@RequestBody PaymentAdditionRequest paymentAdditionRequest) {
+    System.out.println("Add payment to invoice: " + paymentAdditionRequest);
     Invoice invoice = invoiceService.addPaymentToInvoice(paymentAdditionRequest.getInvoiceId(),
         paymentAdditionRequest.getPaymentDate(), paymentAdditionRequest.getAmount(),
         paymentAdditionRequest.getMethod(), paymentAdditionRequest.getReference());
+    System.out.println("Invoice after payment addition in controller: " + invoice);
     Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
     return InvoiceResponse.fromInvoice(updatedInvoice);
   }

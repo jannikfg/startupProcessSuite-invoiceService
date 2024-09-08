@@ -51,7 +51,7 @@ public class InvoiceEntity {
   private double taxTotal;
   private double total;
   private double totalOutstanding;
-  private boolean isPaid;
+  private boolean paid;
 
   @OneToMany(cascade = CascadeType.ALL)
   private List<CreditNoteEntity> creditNotes;
@@ -89,7 +89,7 @@ public class InvoiceEntity {
         .taxTotal(this.taxTotal)
         .total(this.total)
         .totalOutstanding(this.totalOutstanding)
-        .isPaid(this.isPaid)
+        .paid(this.paid)
         .creditNotes(creditNotes)
         .payments(payments)
         .documents(this.documents)

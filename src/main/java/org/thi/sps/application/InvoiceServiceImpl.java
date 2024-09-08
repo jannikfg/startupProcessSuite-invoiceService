@@ -53,7 +53,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         .taxTotal(calculateTaxTotalForInvoice(invoiceItems))
         .total(calculateTotalForInvoice(invoiceItems))
         .totalOutstanding(calculateTotalForInvoice(invoiceItems))
-        .isPaid(false)
+        .paid(false)
         .build();
     return invoiceRepository.save(invoice);
   }
@@ -79,7 +79,11 @@ public class InvoiceServiceImpl implements InvoiceService {
   }
 
   private double calculateNetTotalForInvoiceItem(InvoiceItem invoiceItem) {
-    return invoiceItem.getNetPrice() * invoiceItem.getQuantity() * (1 - invoiceItem.getDiscount());
+    double netPrice = invoiceItem.getNetPrice() >= 0 ? invoiceItem.getNetPrice() : 0;
+    double quantity = invoiceItem.getQuantity() >= 0 ? invoiceItem.getQuantity() : 0;
+    double discount = invoiceItem.getDiscount() >= 0 && invoiceItem.getDiscount() <= 100 ? invoiceItem.getDiscount() : 0;
+
+    return netPrice * quantity * (1 - discount / 100);
   }
 
   private double calculateTaxTotalForInvoiceItem(InvoiceItem invoiceItem) {
@@ -159,7 +163,6 @@ public class InvoiceServiceImpl implements InvoiceService {
   @Transactional
   public Invoice updateInvoice(Invoice invoice) {
     Invoice invoiceFromDb = invoiceRepository.findById(invoice.getId());
-    System.out.println("InvoiceFromDb: " + invoiceFromDb);
     if (invoiceFromDb == null) {
       throw new InvoiceNotFoundException("Invoice not found with id: " + invoice.getId());
     }
@@ -199,7 +202,7 @@ public class InvoiceServiceImpl implements InvoiceService {
           .quantity(item.getQuantity())
           .unit(item.getUnit())
           .discount(item.getDiscount())
-          .netPrice(item.getNetPrice() - item.getNetPrice() * item.getDiscount())
+          .netPrice(item.getNetPrice() - item.getNetPrice() * 100/item.getDiscount())
           .taxRate(parseTaxRate(item.getTaxRate()))
           .netTotal(item.getNetPrice() * item.getQuantity())
           .taxTotal(item.getNetPrice() * item.getQuantity() * Double.parseDouble(item.getTaxRate()))
@@ -220,7 +223,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Override
   public Invoice getInvoiceById(String invoiceId) {
-    System.out.println("InvoiceId: " + invoiceId);
     return invoiceRepository.findById(invoiceId);
   }
 

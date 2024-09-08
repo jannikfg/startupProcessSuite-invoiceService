@@ -30,7 +30,7 @@ public class InvoiceResponse {
   private String taxTotal; //Steuerbetrag
   private String total; //Gesamtbetrag
   private String totalOutstanding; //Offener Betrag
-  private boolean isPaid; //Bezahlt
+  private boolean paid; //Bezahlt
   private List<CreditNoteResponse> creditNotes; //Liste der Gutschriften
   private List<PaymentResponse> payments; //Liste der Zahlungen
   private List<Document> documents; //Liste der Dokumente
@@ -59,7 +59,7 @@ public class InvoiceResponse {
         .taxTotal(String.format("%.2f", invoice.getTaxTotal()))
         .total(String.format("%.2f", invoice.getTotal()))
         .totalOutstanding(String.format("%.2f", invoice.getTotalOutstanding()))
-        .isPaid(invoice.isPaid())
+        .paid(invoice.isPaid())
         .creditNotes(creditNotes)
         .payments(payments)
         .documents(invoice.getDocuments())
