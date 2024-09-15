@@ -60,7 +60,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     return invoiceRepository.save(invoice);
   }
 
-  private Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
+  public Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
     return Invoice.builder()
         .id(invoiceChangeRequest.getId())
         .description(invoiceChangeRequest.getDescription())
