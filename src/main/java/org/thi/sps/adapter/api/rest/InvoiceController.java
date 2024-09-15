@@ -86,7 +86,7 @@ public class InvoiceController {
     List<Product> newProducts = invoiceService.getProducts(
         invoiceChangeWithNewProductsRequest.getItemsToAdd(),
         invoiceChangeWithNewProductsRequest.getProductsFromService());
-    Invoice invoice = buildInvoiceFromInvoiceChangeRequest(
+    Invoice invoice = invoiceService.buildInvoiceFromInvoiceChangeRequest(
         invoiceChangeWithNewProductsRequest.getInvoiceChangeRequest());
     Invoice invoiceUpdated = invoiceService.updateInvoiceWithNewProducts(invoice, newProducts);
     return InvoiceResponse.fromInvoice(invoiceUpdated);
@@ -95,7 +95,7 @@ public class InvoiceController {
   @POST
   @Path("/update")
   public InvoiceResponse updateInvoice(InvoiceChangeRequest invoiceChangeRequest) {
-    Invoice invoice = buildInvoiceFromInvoiceChangeRequest(invoiceChangeRequest);
+    Invoice invoice = invoiceService.buildInvoiceFromInvoiceChangeRequest(invoiceChangeRequest);
     Invoice invoiceUpdated = invoiceService.updateInvoice(invoice);
     return InvoiceResponse.fromInvoice(invoiceUpdated);
   }
@@ -121,18 +121,7 @@ public class InvoiceController {
     return InvoiceResponse.fromInvoice(updatedInvoice);
   }
 
-  private Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
-    return Invoice.builder()
-        .id(invoiceChangeRequest.getId())
-        .description(invoiceChangeRequest.getDescription())
-        .invoiceItems(
-            invoiceChangeRequest.getInvoiceItems().stream().map(InvoiceItemRequest::toInvoiceItem)
-                .toList())
-        .noticeOfRetentionObligation(invoiceChangeRequest.getNoticeOfRetentionObligation())
-        .noticeOfTaxExemption(invoiceChangeRequest.getNoticeOfTaxExemption())
-        .documents(invoiceChangeRequest.getDocuments())
-        .build();
-  }
+
 
 
 }

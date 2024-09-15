@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
+import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
 import org.thi.sps.adapter.api.rest.dto.NewDocumentCreationRequest;
 import org.thi.sps.application.exeptions.InvoiceNotFoundException;
@@ -56,6 +58,19 @@ public class InvoiceServiceImpl implements InvoiceService {
         .paid(false)
         .build();
     return invoiceRepository.save(invoice);
+  }
+
+  private Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
+    return Invoice.builder()
+        .id(invoiceChangeRequest.getId())
+        .description(invoiceChangeRequest.getDescription())
+        .invoiceItems(
+            invoiceChangeRequest.getInvoiceItems().stream().map(InvoiceItemRequest::toInvoiceItem)
+                .toList())
+        .noticeOfRetentionObligation(invoiceChangeRequest.getNoticeOfRetentionObligation())
+        .noticeOfTaxExemption(invoiceChangeRequest.getNoticeOfTaxExemption())
+        .documents(invoiceChangeRequest.getDocuments())
+        .build();
   }
 
   private void calculateInvoiceItems(List<InvoiceItem> invoiceItems) {
