@@ -45,6 +45,7 @@ public class InvoiceEntity {
   private List<InvoiceItemEntity> items;
 
   private LocalDate dateOfDelivery;
+  private LocalDate dueDate;
   private String noticeOfTaxExemption;
   private String noticeOfRetentionObligation;
   private double netTotal;
@@ -83,6 +84,7 @@ public class InvoiceEntity {
         .clientId(this.clientId)
         .invoiceItems(items)
         .dateOfDelivery(this.dateOfDelivery)
+        .dueDate(this.dateOfDelivery)
         .noticeOfTaxExemption(this.noticeOfTaxExemption)
         .noticeOfRetentionObligation(this.noticeOfRetentionObligation)
         .netTotal(this.netTotal)
@@ -116,6 +118,7 @@ public class InvoiceEntity {
         invoice.getClientId(),
         items,
         invoice.getDateOfDelivery(),
+        invoice.getDueDate(),
         invoice.getNoticeOfTaxExemption(),
         invoice.getNoticeOfRetentionObligation(),
         invoice.getNetTotal(),

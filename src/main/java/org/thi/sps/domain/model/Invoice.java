@@ -19,6 +19,7 @@ public class Invoice {
   private String description; //Beschreibung
   private LocalDate createdDate; //Erstellungsdatum
   private List<InvoiceItem> invoiceItems; //Liste der Rechnungspositionen
+  private LocalDate dueDate; //Fälligkeitsdatum
   private Long clientId; //Kundennummer
   private LocalDate dateOfDelivery; //Lieferdatum bzw. Datum der erbrachten Dienstleistung
   private String noticeOfTaxExemption; //Hinweis bei Steuerbefreiung

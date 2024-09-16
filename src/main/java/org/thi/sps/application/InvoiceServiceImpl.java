@@ -7,15 +7,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
-import org.thi.sps.adapter.api.rest.dto.NewDocumentCreationRequest;
 import org.thi.sps.application.exeptions.InvoiceNotFoundException;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.CreditNote;
-import org.thi.sps.domain.model.Document;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
 import org.thi.sps.domain.model.Payment;
@@ -49,6 +46,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         .createdDate(LocalDate.now())
         .invoiceItems(invoiceItems)
         .dateOfDelivery(invoiceRequest.getDateOfDelivery())
+        .dueDate(calculateDueDate(invoiceRequest.getDateOfDelivery()))
         .noticeOfTaxExemption(noticeOfTaxExemption)
         .noticeOfRetentionObligation(noticeOfRetentionObligation)
         .netTotal(calculateNetTotalForInvoice(invoiceItems))
@@ -58,6 +56,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         .paid(false)
         .build();
     return invoiceRepository.save(invoice);
+  }
+
+  private LocalDate calculateDueDate(LocalDate dateOfDelivery) {
+    return dateOfDelivery.plusDays(14);
   }
 
   public Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
@@ -142,20 +144,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     return updateInvoice(invoice);
   }
 
-  @Override
-  public String getLatestDocumentOfInvoice(String invoiceId) {
-    return Optional.ofNullable(getInvoiceById(invoiceId))
-        .map(invoice -> {
-          List<Document> documents = invoice.getDocuments();
-          if (documents != null && !documents.isEmpty()) {
-            return documents.get(documents.size() - 1).getId();
-          } else {
-            return invoice.getId();
-          }
-        })
-        .orElseThrow(() -> new InvoiceNotFoundException("Invoice not found with id: " + invoiceId));
-  }
-
+  /*
   @Override
   public String addNewDocumentToInvoice(NewDocumentCreationRequest newDocumentCreationRequest) {
     Invoice invoice = getInvoiceById(newDocumentCreationRequest.getInvoiceId());
@@ -170,9 +159,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     return documentId;
   }
 
+
   public String getNextDocumentId(Invoice invoice) {
     return invoice.getId() + "_" + (invoice.getDocuments().size() + 1);
   }
+   */
 
   @Override
   @Transactional
@@ -191,6 +182,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoiceFromDb.setNetTotal(calculateNetTotalForInvoice(invoice.getInvoiceItems()));
     invoiceFromDb.setTaxTotal(calculateTaxTotalForInvoice(invoice.getInvoiceItems()));
     invoiceFromDb.setTotal(calculateTotalForInvoice(invoice.getInvoiceItems()));
+    invoiceFromDb.setDueDate(invoice.getDueDate());
     invoiceFromDb.setCreditNotes(invoice.getCreditNotes());
     invoiceFromDb.setPayments(invoice.getPayments());
     invoiceFromDb.setTotalOutstanding(calculateTotalOutstanding(invoice));

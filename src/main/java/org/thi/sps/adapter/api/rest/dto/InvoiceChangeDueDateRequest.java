@@ -1,5 +1,6 @@
 package org.thi.sps.adapter.api.rest.dto;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,9 +14,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NewDocumentCreationRequest {
+public class InvoiceChangeDueDateRequest {
 
-  private String invoiceId;
-  private String reason;
+  String invoiceId;
+  LocalDate newDueDate;
 
 }

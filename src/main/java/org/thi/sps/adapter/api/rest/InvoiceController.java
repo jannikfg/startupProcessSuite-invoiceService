@@ -13,13 +13,11 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.thi.sps.adapter.api.rest.dto.DocumentResponse;
+import org.thi.sps.adapter.api.rest.dto.InvoiceChangeDueDateRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeWithNewProductsRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
-import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
-import org.thi.sps.adapter.api.rest.dto.InvoicePaidStatusChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceResponse;
-import org.thi.sps.adapter.api.rest.dto.NewDocumentCreationRequest;
 import org.thi.sps.adapter.api.rest.dto.PaymentAdditionRequest;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
@@ -61,23 +59,6 @@ public class InvoiceController {
     return InvoiceResponse.fromInvoice(invoice);
   }
 
-  @GET
-  @Path("/{id}/LatestDocument")
-  @Produces(MediaType.APPLICATION_JSON)
-  public DocumentResponse getLatestDocument(@PathParam("id") String id) {
-    String documentId = invoiceService.getLatestDocumentOfInvoice(id);
-    return DocumentResponse.builder().id(documentId).build();
-  }
-
-  @POST
-  @Path("/requestNewDocumentId")
-  public DocumentResponse requestNewDocumentId(@RequestBody NewDocumentCreationRequest newDocumentCreationRequest) {
-    String documentId = invoiceService.addNewDocumentToInvoice(newDocumentCreationRequest);
-    return DocumentResponse.builder()
-        .id(documentId)
-        .reason(newDocumentCreationRequest.getReason())
-        .build();
-  }
 
   @POST
   @Path("/updateWithNewProducts")
@@ -116,12 +97,16 @@ public class InvoiceController {
     Invoice invoice = invoiceService.addPaymentToInvoice(paymentAdditionRequest.getInvoiceId(),
         paymentAdditionRequest.getPaymentDate(), paymentAdditionRequest.getAmount(),
         paymentAdditionRequest.getMethod(), paymentAdditionRequest.getReference());
-    System.out.println("Invoice after payment addition in controller: " + invoice);
     Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
     return InvoiceResponse.fromInvoice(updatedInvoice);
   }
 
-
-
-
+  @POST
+  @Path("/changeDueDate")
+  public InvoiceResponse changeDueDate(@RequestBody InvoiceChangeDueDateRequest invoiceChangeDueDateRequest) {
+    Invoice invoice = invoiceService.getInvoiceById(invoiceChangeDueDateRequest.getInvoiceId());
+    invoice.setDueDate(invoiceChangeDueDateRequest.getNewDueDate());
+    Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
+    return InvoiceResponse.fromInvoice(updatedInvoice);
+  }
 }

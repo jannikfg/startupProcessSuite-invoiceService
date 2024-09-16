@@ -24,6 +24,7 @@ public class InvoiceResponse {
   private List<InvoiceItemResponse> invoiceItems; //Liste der Rechnungspositionen
   private Long clientId; //Kundennummer
   private LocalDate dateOfDelivery; //Lieferdatum bzw. Datum der erbrachten Dienstleistung
+  private LocalDate dueDate; //Fälligkeitsdatum
   private String noticeOfTaxExemption; //Hinweis bei Steuerbefreiung
   private String noticeOfRetentionObligation; // In den Fällen des $14 b Abs. 1 Satz 5 UStF einen Hinweis auf die Aufbewahrungspflicht des Rechnungsempfängers
   private String netTotal; //Nettobetrag
@@ -53,6 +54,7 @@ public class InvoiceResponse {
         .invoiceItems(invoiceItems)
         .clientId(invoice.getClientId())
         .dateOfDelivery(invoice.getDateOfDelivery())
+        .dueDate(invoice.getDueDate())
         .noticeOfTaxExemption(invoice.getNoticeOfTaxExemption())
         .noticeOfRetentionObligation(invoice.getNoticeOfRetentionObligation())
         .netTotal(String.format("%.2f", invoice.getNetTotal()))
