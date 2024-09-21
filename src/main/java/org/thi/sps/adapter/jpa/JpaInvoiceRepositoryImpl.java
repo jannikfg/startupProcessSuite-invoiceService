@@ -1,11 +1,7 @@
 package org.thi.sps.adapter.jpa;
 
-import static io.quarkus.hibernate.orm.panache.Panache.getEntityManager;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.NoResultException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.thi.sps.adapter.jpa.Entities.InvoiceEntity;

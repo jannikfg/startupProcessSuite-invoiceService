@@ -20,11 +20,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.thi.sps.domain.model.CreditNote;
 import org.thi.sps.domain.model.Document;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
 import org.thi.sps.domain.model.Payment;
+import org.thi.sps.domain.model.Reminder;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,26 +55,23 @@ public class InvoiceEntity {
   private boolean paid;
 
   @OneToMany(cascade = CascadeType.ALL)
-  private List<CreditNoteEntity> creditNotes;
-
-  @OneToMany(cascade = CascadeType.ALL)
   private List<PaymentEntity> payments;
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "invoice_documents", joinColumns = @JoinColumn(name = "invoice_id"))
-  private List<Document> documents;
+  @OneToMany(cascade = CascadeType.ALL)
+  private List<ReminderEntity> reminders;
+
 
   public Invoice toInvoice() {
     List<InvoiceItem> items = Optional.ofNullable(this.items)
         .map(list -> list.stream().map(InvoiceItemEntity::toInvoiceItem).collect(toList()))
         .orElseGet(Collections::emptyList);
 
-    List<CreditNote> creditNotes = Optional.ofNullable(this.creditNotes)
-        .map(list -> list.stream().map(CreditNoteEntity::toCreditNote).collect(toList()))
-        .orElseGet(Collections::emptyList);
-
     List<Payment> payments = Optional.ofNullable(this.payments)
         .map(list -> list.stream().map(PaymentEntity::toPayment).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    List<Reminder> reminders = Optional.ofNullable(this.reminders)
+        .map(list -> list.stream().map(ReminderEntity::toReminder).collect(toList()))
         .orElseGet(Collections::emptyList);
 
     return Invoice.builder()
@@ -92,9 +89,8 @@ public class InvoiceEntity {
         .total(this.total)
         .totalOutstanding(this.totalOutstanding)
         .paid(this.paid)
-        .creditNotes(creditNotes)
         .payments(payments)
-        .documents(this.documents)
+        .reminders(reminders)
         .build();
   }
 
@@ -103,12 +99,12 @@ public class InvoiceEntity {
         .map(list -> list.stream().map(InvoiceItemEntity::fromInvoiceItem).collect(toList()))
         .orElseGet(Collections::emptyList);
 
-    List<CreditNoteEntity> creditNotes = Optional.ofNullable(invoice.getCreditNotes())
-        .map(list -> list.stream().map(CreditNoteEntity::fromCreditNote).collect(toList()))
-        .orElseGet(Collections::emptyList);
-
     List<PaymentEntity> payments = Optional.ofNullable(invoice.getPayments())
         .map(list -> list.stream().map(PaymentEntity::fromPayment).collect(toList()))
+        .orElseGet(Collections::emptyList);
+
+    List<ReminderEntity> reminders = Optional.ofNullable(invoice.getReminders())
+        .map(list -> list.stream().map(ReminderEntity::fromReminder).collect(toList()))
         .orElseGet(Collections::emptyList);
 
     return new InvoiceEntity(
@@ -126,9 +122,8 @@ public class InvoiceEntity {
         invoice.getTotal(),
         invoice.getTotalOutstanding(),
         invoice.isPaid(),
-        creditNotes,
         payments,
-        invoice.getDocuments()
+        reminders
     );
   }
 }

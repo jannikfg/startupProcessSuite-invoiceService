@@ -29,8 +29,7 @@ public class Invoice {
   private double total; //Gesamtbetrag
   private double totalOutstanding; //Offener Betrag
   private boolean paid; //Bezahlt
-  private List<CreditNote> creditNotes; //Liste der angewendeten Gutschriften
   private List<Payment> payments; //Liste der Zahlungen
-  private List<Document> documents; //Liste der Dokumente
+  private List<Reminder> reminders;
 
 }

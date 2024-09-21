@@ -29,9 +29,10 @@ public interface InvoiceService {
   List<Product> getProducts(List<InvoiceItemsAdditionRequest> itemsToAdd,
       List<Product> productsFromService);
 
-  Invoice addCreditNoteToInvoice(String invoiceId, String reason, double amount);
 
   Invoice addPaymentToInvoice(String invoiceId, LocalDate paymentDay, double amount, String method, String reference);
 
   Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest);
+
+  Invoice addReminderToInvoice(int dueInDays, String reminderLevel, String invoiceId);
 }

@@ -12,11 +12,11 @@ import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
 import org.thi.sps.application.exeptions.InvoiceNotFoundException;
 import org.thi.sps.domain.InvoiceService;
-import org.thi.sps.domain.model.CreditNote;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
 import org.thi.sps.domain.model.Payment;
 import org.thi.sps.domain.model.Product;
+import org.thi.sps.domain.model.Reminder;
 import org.thi.sps.domain.model.helper.InvoiceRequest;
 import org.thi.sps.ports.outgoing.InvoiceRepository;
 
@@ -71,8 +71,32 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .toList())
         .noticeOfRetentionObligation(invoiceChangeRequest.getNoticeOfRetentionObligation())
         .noticeOfTaxExemption(invoiceChangeRequest.getNoticeOfTaxExemption())
-        .documents(invoiceChangeRequest.getDocuments())
         .build();
+  }
+
+  @Override
+  public Invoice addReminderToInvoice(int dueInDays, String reminderLevel, String invoiceId) {
+    Invoice invoiceFromDb = invoiceRepository.findById(invoiceId);
+    if (invoiceFromDb == null) {
+      throw new InvoiceNotFoundException("Invoice not found with id: " + invoiceId);
+    }
+    List<Reminder> reminders = invoiceFromDb.getReminders();
+    if (reminders == null) {
+      reminders = new ArrayList<>();
+    }
+
+    reminders.add(Reminder.builder()
+        .dueInDays(dueInDays)
+        .reminderLevel(reminderLevel)
+        .paymentIds(new ArrayList<String>(invoiceFromDb.getPayments()
+            .stream()
+            .map(payment -> String.valueOf(payment.getId()))
+            .toList()))
+        .reminderDate(LocalDate.now())
+        .totalOutstanding(invoiceFromDb.getTotalOutstanding())
+        .build());
+    invoiceFromDb.setReminders(reminders);
+    return updateInvoice(invoiceFromDb);
   }
 
   private void calculateInvoiceItems(List<InvoiceItem> invoiceItems) {
@@ -113,21 +137,13 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   private double calculateTotalOutstanding(Invoice invoice) {
 
-    if (invoice.getCreditNotes() == null && invoice.getPayments() == null) {
-      return invoice.getTotal();
-    }
 
-    double creditNotesTotal = 0;
-    if (invoice.getCreditNotes() != null) {
-      creditNotesTotal = invoice.getCreditNotes().stream().mapToDouble(CreditNote::getAmount)
-          .sum();
-    }
 
     double paymentsTotal = 0;
     if (invoice.getPayments() != null) {
       paymentsTotal = invoice.getPayments().stream().mapToDouble(Payment::getAmount).sum();
     }
-    double totalOutstanding = invoice.getTotal() - creditNotesTotal - paymentsTotal;
+    double totalOutstanding = invoice.getTotal() - paymentsTotal;
     if (totalOutstanding < 0) {
       return 0;
     }
@@ -143,27 +159,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoice.setInvoiceItems(invoiceItems);
     return updateInvoice(invoice);
   }
-
-  /*
-  @Override
-  public String addNewDocumentToInvoice(NewDocumentCreationRequest newDocumentCreationRequest) {
-    Invoice invoice = getInvoiceById(newDocumentCreationRequest.getInvoiceId());
-    List<Document> documents = new ArrayList<>(invoice.getDocuments());
-    String documentId = getNextDocumentId(invoice);
-    documents.add(Document.builder()
-        .id(documentId)
-        .reason(newDocumentCreationRequest.getReason())
-        .build());
-    invoice.setDocuments(documents);
-    updateInvoice(invoice);
-    return documentId;
-  }
-
-
-  public String getNextDocumentId(Invoice invoice) {
-    return invoice.getId() + "_" + (invoice.getDocuments().size() + 1);
-  }
-   */
 
   @Override
   @Transactional
@@ -183,18 +178,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoiceFromDb.setTaxTotal(calculateTaxTotalForInvoice(invoice.getInvoiceItems()));
     invoiceFromDb.setTotal(calculateTotalForInvoice(invoice.getInvoiceItems()));
     invoiceFromDb.setDueDate(invoice.getDueDate());
-    invoiceFromDb.setCreditNotes(invoice.getCreditNotes());
     invoiceFromDb.setPayments(invoice.getPayments());
     invoiceFromDb.setTotalOutstanding(calculateTotalOutstanding(invoice));
     invoiceFromDb.setPaid(invoice.isPaid());
-    if (invoice.getCreditNotes() != null) {
-      invoiceFromDb.setCreditNotes(invoice.getCreditNotes());
-    }
     if (invoice.getPayments() != null) {
       invoiceFromDb.setPayments(invoice.getPayments());
     }
-    if (invoice.getDocuments() != null) {
-      invoiceFromDb.setDocuments(invoice.getDocuments());
+    if (invoice.getReminders() != null) {
+      invoiceFromDb.setReminders(invoice.getReminders());
     }
     return invoiceRepository.update(invoiceFromDb);
   }
@@ -259,8 +250,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Override
   public List<Invoice> getAllInvoices() {
-    List<Invoice> invoices = invoiceRepository.findAll();
-    return invoices;
+    return invoiceRepository.findAll();
   }
 
   @Override
@@ -280,22 +270,6 @@ public class InvoiceServiceImpl implements InvoiceService {
       }
     }
     return newProducts;
-  }
-
-  @Override
-  public Invoice addCreditNoteToInvoice(String invoiceId, String reason, double amount) {
-    Invoice invoice = getInvoiceById(invoiceId);
-    CreditNote creditNote = CreditNote.builder()
-        .invoiceId(invoiceId)
-        .createdDate(LocalDate.now())
-        .reason(reason)
-        .amount(amount)
-        .build();
-    List<CreditNote> creditNotes = new ArrayList<>(invoice.getCreditNotes());
-    creditNotes.add(creditNote);
-    invoice.setCreditNotes(creditNotes);
-
-    return updateInvoice(invoice);
   }
 
   @Override

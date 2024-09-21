@@ -32,20 +32,19 @@ public class InvoiceResponse {
   private String total; //Gesamtbetrag
   private String totalOutstanding; //Offener Betrag
   private boolean paid; //Bezahlt
-  private List<CreditNoteResponse> creditNotes; //Liste der Gutschriften
   private List<PaymentResponse> payments; //Liste der Zahlungen
-  private List<Document> documents; //Liste der Dokumente
+  private List<ReminderResponse> reminders; //Liste der Mahnungen
 
 
   public static InvoiceResponse fromInvoice(Invoice invoice) {
-    List<CreditNoteResponse> creditNotes = Optional.ofNullable(invoice.getCreditNotes())
-        .map(list -> list.stream().map(CreditNoteResponse::fromCreditNote).toList())
-        .orElseGet(List::of);
     List<PaymentResponse> payments = Optional.ofNullable(invoice.getPayments())
         .map(list -> list.stream().map(PaymentResponse::fromPayment).toList())
         .orElseGet(List::of);
     List<InvoiceItemResponse> invoiceItems = Optional.ofNullable(invoice.getInvoiceItems())
         .map(list -> list.stream().map(InvoiceItemResponse::fromInvoiceItem).toList())
+        .orElseGet(List::of);
+    List<ReminderResponse> reminders = Optional.ofNullable(invoice.getReminders())
+        .map(list -> list.stream().map(ReminderResponse::fromReminder).toList())
         .orElseGet(List::of);
     return InvoiceResponse.builder()
         .id(invoice.getId())
@@ -62,9 +61,8 @@ public class InvoiceResponse {
         .total(String.format("%.2f", invoice.getTotal()))
         .totalOutstanding(String.format("%.2f", invoice.getTotalOutstanding()))
         .paid(invoice.isPaid())
-        .creditNotes(creditNotes)
         .payments(payments)
-        .documents(invoice.getDocuments())
+        .reminders(reminders)
         .build();
   }
 }

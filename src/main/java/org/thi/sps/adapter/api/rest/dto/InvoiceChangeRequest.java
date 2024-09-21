@@ -23,5 +23,4 @@ public class InvoiceChangeRequest {
   private List<InvoiceItemRequest> invoiceItems;
   private String noticeOfTaxExemption;
   private String noticeOfRetentionObligation;
-  private List<Document> documents;
 }
