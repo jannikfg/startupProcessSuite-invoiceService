@@ -12,13 +12,13 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-import org.thi.sps.adapter.api.rest.dto.DocumentResponse;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeDueDateRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeWithNewProductsRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceResponse;
 import org.thi.sps.adapter.api.rest.dto.PaymentAdditionRequest;
+import org.thi.sps.adapter.api.rest.dto.ReminderAdditionRequest;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.Product;
@@ -106,6 +106,15 @@ public class InvoiceController {
   public InvoiceResponse changeDueDate(@RequestBody InvoiceChangeDueDateRequest invoiceChangeDueDateRequest) {
     Invoice invoice = invoiceService.getInvoiceById(invoiceChangeDueDateRequest.getInvoiceId());
     invoice.setDueDate(invoiceChangeDueDateRequest.getNewDueDate());
+    Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
+    return InvoiceResponse.fromInvoice(updatedInvoice);
+  }
+
+  @POST
+  @Path("/addReminder")
+  public InvoiceResponse addReminder(@RequestBody ReminderAdditionRequest reminderAdditionRequest) {
+    Invoice invoice = invoiceService.getInvoiceById(reminderAdditionRequest.getInvoiceId());
+    invoiceService.addReminderToInvoice(reminderAdditionRequest.getDueInDays(),reminderAdditionRequest.getReminderLevel(), reminderAdditionRequest.getInvoiceId());
     Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
     return InvoiceResponse.fromInvoice(updatedInvoice);
   }
