@@ -1,5 +1,6 @@
 package org.thi.sps.application;
 
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -7,6 +8,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
@@ -25,6 +28,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   @Inject
   InvoiceRepository invoiceRepository;
+
+  private static final Logger LOG = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
   private final String noticeOfTaxExemption = "Notice of tax exemption";
   private final String noticeOfRetentionObligation = "Notice of retention obligation";
@@ -85,7 +90,10 @@ public class InvoiceServiceImpl implements InvoiceService {
       reminders = new ArrayList<>();
     }
 
+    String reminderId = invoiceId + "-" + reminderLevel;
+
     reminders.add(Reminder.builder()
+            .id(reminderId)
         .dueInDays(dueInDays)
         .reminderLevel(reminderLevel)
         .paymentIds(new ArrayList<String>(invoiceFromDb.getPayments()
@@ -229,23 +237,34 @@ public class InvoiceServiceImpl implements InvoiceService {
     return invoiceRepository.findByClientId(clientId);
   }
 
-  @Override
+  // Erzeugt eine Rechnungs-ID im Format YYYYMM-XXXXX
   public String generateInvoiceId() {
     LocalDate currentDate = LocalDate.now();
-    String datePart = currentDate.format(DateTimeFormatter.BASIC_ISO_DATE);
+    String yearMonthPart = currentDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
 
-    // Generiere eine eindeutige und fortlaufende Rechnungsnummer für das aktuelle Datum
-    int invoiceNumber = getNextInvoiceNumberForDate();
+    int invoiceNumber = getNextInvoiceNumberForMonth(yearMonthPart);
 
-    // Format der Rechnungs-ID: YYYYMMDD-InvoiceNumber
-    return String.format("%s-%04d", datePart, invoiceNumber);
+    return String.format("%s-%05d", yearMonthPart, invoiceNumber);
   }
 
-  private int getNextInvoiceNumberForDate() {
-    invoiceNumber++;
-    //TODO: Hier muss noch eine ausfallsichere Lösung her
-    return invoiceNumber;
+  private int getNextInvoiceNumberForMonth(String yearMonthPart) {
+    try {
+      Integer currentMaxInvoiceNumber = invoiceRepository.getMaxInvoiceNumberForMonth(yearMonthPart);
+      if (currentMaxInvoiceNumber == null) {
+        currentMaxInvoiceNumber = 0;
+      }
+
+      return currentMaxInvoiceNumber + 1;
+    } catch (Exception e) {
+      LOG.error("Fehler beim Abrufen der nächsten Rechnungsnummer für Monat {}: ", yearMonthPart, e);
+      return generateFallbackInvoiceNumber();
+    }
   }
+
+  private int generateFallbackInvoiceNumber() {
+    return (int) (Math.random() * 100000);
+  }
+
 
 
   @Override

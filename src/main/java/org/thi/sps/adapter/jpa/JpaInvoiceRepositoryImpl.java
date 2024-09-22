@@ -2,6 +2,9 @@ package org.thi.sps.adapter.jpa;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import org.thi.sps.adapter.jpa.Entities.InvoiceEntity;
@@ -13,6 +16,9 @@ public class JpaInvoiceRepositoryImpl implements InvoiceRepository {
 
   @Inject
   JpaInvoiceRepository jpaInvoiceRepository;
+
+  @Inject
+  EntityManager entityManager;
 
   @Override
   public Invoice save(Invoice invoice) {
@@ -51,4 +57,27 @@ public class JpaInvoiceRepositoryImpl implements InvoiceRepository {
     return invoiceEntities.stream().map(InvoiceEntity::toInvoice).toList();
   }
 
+
+  @Transactional
+  public Integer getMaxInvoiceNumberForMonth(String yearMonth) {
+    String query = "SELECT MAX(CAST(SUBSTRING(i.id, 8, 5) AS INTEGER)) " +
+        "FROM InvoiceEntity i " +
+        "WHERE FUNCTION('TO_CHAR', i.createdDate, 'yyyyMM') = :yearMonth";
+
+    Integer maxInvoiceNumber = entityManager.createQuery(query, Integer.class)
+        .setParameter("yearMonth", yearMonth)
+        .getSingleResult();
+
+    String lockQuery = "SELECT i FROM InvoiceEntity i " +
+        "WHERE FUNCTION('TO_CHAR', i.createdDate, 'yyyyMM') = :yearMonth";
+
+    entityManager.createQuery(lockQuery, InvoiceEntity.class)
+        .setParameter("yearMonth", yearMonth)
+        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+        .getResultList();
+
+    return maxInvoiceNumber;
+  }
 }
+
+

@@ -18,4 +18,5 @@ public interface InvoiceRepository {
 
   List<Invoice> findAll();
 
+  Integer getMaxInvoiceNumberForMonth(String yearMonthPart);
 }

@@ -25,7 +25,6 @@ import org.thi.sps.domain.model.Reminder;
 public class ReminderEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private String id;
   private String reminderLevel;
 

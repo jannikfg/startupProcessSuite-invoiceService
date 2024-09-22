@@ -103,7 +103,8 @@ public class InvoiceController {
 
   @POST
   @Path("/changeDueDate")
-  public InvoiceResponse changeDueDate(@RequestBody InvoiceChangeDueDateRequest invoiceChangeDueDateRequest) {
+  public InvoiceResponse changeDueDate(
+      @RequestBody InvoiceChangeDueDateRequest invoiceChangeDueDateRequest) {
     Invoice invoice = invoiceService.getInvoiceById(invoiceChangeDueDateRequest.getInvoiceId());
     invoice.setDueDate(invoiceChangeDueDateRequest.getNewDueDate());
     Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
@@ -113,9 +114,8 @@ public class InvoiceController {
   @POST
   @Path("/addReminder")
   public InvoiceResponse addReminder(@RequestBody ReminderAdditionRequest reminderAdditionRequest) {
-    Invoice invoice = invoiceService.getInvoiceById(reminderAdditionRequest.getInvoiceId());
-    invoiceService.addReminderToInvoice(reminderAdditionRequest.getDueInDays(),reminderAdditionRequest.getReminderLevel(), reminderAdditionRequest.getInvoiceId());
-    Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
-    return InvoiceResponse.fromInvoice(updatedInvoice);
+    Invoice invoice = invoiceService.addReminderToInvoice(reminderAdditionRequest.getDueInDays(),
+        reminderAdditionRequest.getReminderLevel(), reminderAdditionRequest.getInvoiceId());
+    return InvoiceResponse.fromInvoice(invoice);
   }
 }
