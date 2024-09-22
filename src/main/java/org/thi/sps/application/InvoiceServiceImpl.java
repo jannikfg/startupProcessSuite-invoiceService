@@ -265,8 +265,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     return (int) (Math.random() * 100000);
   }
 
-
-
   @Override
   public List<Invoice> getAllInvoices() {
     return invoiceRepository.findAll();
