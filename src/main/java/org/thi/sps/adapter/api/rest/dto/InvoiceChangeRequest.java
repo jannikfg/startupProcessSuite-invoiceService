@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.thi.sps.domain.model.Document;
 
 @AllArgsConstructor
 @NoArgsConstructor

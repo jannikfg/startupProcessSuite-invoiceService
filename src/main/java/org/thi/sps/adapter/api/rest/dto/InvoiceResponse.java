@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.thi.sps.domain.model.Document;
 import org.thi.sps.domain.model.Invoice;
 
 @AllArgsConstructor
