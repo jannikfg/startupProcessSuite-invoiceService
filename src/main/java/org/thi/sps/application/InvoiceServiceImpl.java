@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
-import org.thi.sps.adapter.api.rest.dto.InvoiceItemRequest;
 import org.thi.sps.application.exeptions.InvoiceNotFoundException;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
 import org.thi.sps.domain.model.InvoiceItem;
 import org.thi.sps.domain.model.Payment;
 import org.thi.sps.domain.model.Reminder;
+import org.thi.sps.domain.model.helper.InvoiceChangeRequest;
+import org.thi.sps.domain.model.helper.InvoiceItemRequest;
 import org.thi.sps.domain.model.helper.InvoiceRequest;
 import org.thi.sps.ports.outgoing.InvoiceRepository;
 
@@ -64,7 +64,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     return dateOfDelivery.plusDays(14);
   }
 
-  public Invoice buildInvoiceFromInvoiceChangeRequest(InvoiceChangeRequest invoiceChangeRequest) {
+  public Invoice buildInvoiceFromInvoiceChangeRequest(
+      InvoiceChangeRequest invoiceChangeRequest) {
     return Invoice.builder()
         .id(invoiceChangeRequest.getId())
         .description(invoiceChangeRequest.getDescription())

@@ -1,6 +1,5 @@
 package org.thi.sps.adapter.api.rest.dto;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,11 +10,17 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
 @Setter
+@ToString
 @Builder
-public class InvoiceChangeWithNewProductsRequest {
-  private InvoiceChangeRequestDTO invoiceChangeRequestDTO;
-  private List<InvoiceItemsAdditionRequest> itemsToAdd;
-  private List<Product> productsFromService;
+public class Product {
+  private Long id;
+  private String category;
+  private String name;
+  private String description;
+  private double netPrice;
+  private String unit;
+  private String taxRate;
+  private double discount;
+  private double quantity;
 }

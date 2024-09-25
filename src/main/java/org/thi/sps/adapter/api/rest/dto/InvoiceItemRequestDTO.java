@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.thi.sps.domain.model.InvoiceItem;
+import org.thi.sps.domain.model.helper.InvoiceItemRequest;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +16,7 @@ import org.thi.sps.domain.model.InvoiceItem;
 @Getter
 @Setter
 @Builder
-public class InvoiceItemRequest {
+public class InvoiceItemRequestDTO {
 
   private Long id;
   private String name;
@@ -30,8 +31,8 @@ public class InvoiceItemRequest {
 
   private double taxRate;
 
-  public InvoiceItem toInvoiceItem() {
-    return InvoiceItem.builder()
+  public InvoiceItemRequest toInvoiceItemRequest() {
+    return InvoiceItemRequest.builder()
         .id(this.id)
         .name(this.name)
         .description(this.description)

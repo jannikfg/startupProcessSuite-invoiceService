@@ -1,4 +1,4 @@
-package org.thi.sps.adapter.api.rest.dto;
+package org.thi.sps.domain.model.helper;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -14,12 +14,13 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeDueDateRequest;
-import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequest;
+import org.thi.sps.adapter.api.rest.dto.InvoiceChangeRequestDTO;
 import org.thi.sps.adapter.api.rest.dto.InvoiceChangeWithNewProductsRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceCreationRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceItemsAdditionRequest;
 import org.thi.sps.adapter.api.rest.dto.InvoiceResponse;
 import org.thi.sps.adapter.api.rest.dto.PaymentAdditionRequest;
+import org.thi.sps.adapter.api.rest.dto.Product;
 import org.thi.sps.adapter.api.rest.dto.ReminderAdditionRequest;
 import org.thi.sps.domain.InvoiceService;
 import org.thi.sps.domain.model.Invoice;
@@ -70,15 +71,15 @@ public class InvoiceController {
         invoiceChangeWithNewProductsRequest.getItemsToAdd(),
         invoiceChangeWithNewProductsRequest.getProductsFromService());
     Invoice invoice = invoiceService.buildInvoiceFromInvoiceChangeRequest(
-        invoiceChangeWithNewProductsRequest.getInvoiceChangeRequest());
+        invoiceChangeWithNewProductsRequest.getInvoiceChangeRequestDTO().toInvoiceChangeRequest());
     Invoice invoiceUpdated = updateInvoiceWithNewProducts(invoice, newProducts);
     return InvoiceResponse.fromInvoice(invoiceUpdated);
   }
 
   @POST
   @Path("/update")
-  public InvoiceResponse updateInvoice(InvoiceChangeRequest invoiceChangeRequest) {
-    Invoice invoice = invoiceService.buildInvoiceFromInvoiceChangeRequest(invoiceChangeRequest);
+  public InvoiceResponse updateInvoice(InvoiceChangeRequestDTO invoiceChangeRequestDTO) {
+    Invoice invoice = invoiceService.buildInvoiceFromInvoiceChangeRequest(invoiceChangeRequestDTO.toInvoiceChangeRequest());
     Invoice invoiceUpdated = invoiceService.updateInvoice(invoice);
     return InvoiceResponse.fromInvoice(invoiceUpdated);
   }
