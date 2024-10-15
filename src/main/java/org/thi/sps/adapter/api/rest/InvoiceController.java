@@ -84,6 +84,15 @@ public class InvoiceController {
     return InvoiceResponse.fromInvoice(invoiceUpdated);
   }
 
+  @POST
+  @Path("/updateDueDate")
+  public InvoiceResponse updateDueDate(InvoiceChangeDueDateRequest invoiceChangeDueDateRequest) {
+    Invoice invoice = invoiceService.getInvoiceById(invoiceChangeDueDateRequest.getInvoiceId());
+    invoice.setDueDate(invoiceChangeDueDateRequest.getNewDueDate());
+    Invoice updatedInvoice = invoiceService.updateInvoice(invoice);
+    return InvoiceResponse.fromInvoice(updatedInvoice);
+  }
+
   @GET
   @Path("/{id}/setPaid")
   public InvoiceResponse setPaid(@PathParam("id") String id) {
@@ -96,7 +105,6 @@ public class InvoiceController {
   @POST
   @Path("/addPayment")
   public InvoiceResponse addPayment(@RequestBody PaymentAdditionRequest paymentAdditionRequest) {
-    System.out.println("Add payment to invoice: " + paymentAdditionRequest);
     Invoice invoice = invoiceService.addPaymentToInvoice(paymentAdditionRequest.getInvoiceId(),
         paymentAdditionRequest.getPaymentDate(), paymentAdditionRequest.getAmount(),
         paymentAdditionRequest.getMethod(), paymentAdditionRequest.getReference());

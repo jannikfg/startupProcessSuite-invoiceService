@@ -29,8 +29,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
   private static final Logger LOG = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
-  private final String noticeOfTaxExemption = "Notice of tax exemption";
-  private final String noticeOfRetentionObligation = "Notice of retention obligation";
+  private final String noticeOfTaxExemption = "Dieser Text kann als Hinweis auf eine Steuerbefreiung genutzt werden.";
+  private final String noticeOfRetentionObligation = "Dieser Text kann als Hinweis auf eine Aufbewahrungspflicht genutzt werden.";
 
 
   @Override
@@ -114,15 +114,11 @@ public class InvoiceServiceImpl implements InvoiceService {
   }
 
   private double calculateTotalOutstanding(Invoice invoice) {
-
     double paymentsTotal = 0;
     if (invoice.getPayments() != null) {
       paymentsTotal = invoice.getPayments().stream().mapToDouble(Payment::getAmount).sum();
     }
     double totalOutstanding = invoice.getTotal() - paymentsTotal;
-    if (totalOutstanding < 0) {
-      return 0;
-    }
     return totalOutstanding;
   }
 
@@ -134,7 +130,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     if (invoiceFromDb == null) {
       throw new InvoiceNotFoundException("Invoice not found with id: " + invoice.getId());
     }
-
     calculateInvoiceItems(invoice.getInvoiceItems());
 
     invoiceFromDb.setDescription(invoice.getDescription());
@@ -146,7 +141,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     invoiceFromDb.setTotal(calculateTotalForInvoice(invoice.getInvoiceItems()));
     invoiceFromDb.setDueDate(invoice.getDueDate());
     invoiceFromDb.setPayments(invoice.getPayments());
-    invoiceFromDb.setTotalOutstanding(calculateTotalOutstanding(invoice));
+    invoiceFromDb.setTotalOutstanding(calculateTotalOutstanding(invoiceFromDb));
     invoiceFromDb.setPaid(invoice.isPaid());
     if (invoice.getPayments() != null) {
       invoiceFromDb.setPayments(invoice.getPayments());
